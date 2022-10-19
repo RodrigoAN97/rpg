@@ -25,6 +25,16 @@ namespace rpg_api.Controllers
             return Ok(await _characterService.GetAllCharacters());
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Delete(int id)
+        {
+            var response = await _characterService.DeleteCharacter(id);
+            if(response.Data == null){
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse<GetCharacterDto>>> GetSingle(int id)
         {
