@@ -26,7 +26,8 @@ namespace rpg_api.Services.CharacterService
 
         public Character GetCharacterById(int id)
         {
-            return characters.FirstOrDefault(c => c.Id == id);
+            // return characters.FirstOrDefault(c => c.Id == id);
+            return characters.First(c => c.Id == id);
         }
     }
 }
