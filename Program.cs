@@ -6,8 +6,11 @@ using rpg_api.Services.CharacterService;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+DotNetEnv.Env.Load();
+var connectionString = DotNetEnv.Env.GetString("CONNECTION_STRING");
+
 builder.Services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
         
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
