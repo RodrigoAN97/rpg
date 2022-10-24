@@ -6,8 +6,6 @@ using rpg_api.Services.CharacterService;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// builder.Services.AddEntityFrameworkNpgsql().AddDbContext<DataContext>(opt =>
-//         opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
         
