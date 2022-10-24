@@ -11,11 +11,6 @@ namespace rpg_api.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
-        private static List<Character> characters = new List<Character>
-        {
-            new Character(),
-            new Character{ Id= 1, Name = "Sam" }
-        };
         
         private readonly IMapper _mapper;
         private readonly DataContext _context;
@@ -40,9 +35,11 @@ namespace rpg_api.Services.CharacterService
             ServiceResponse<List<GetCharacterDto>> serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
 
             try {
-                Character character = characters.First(c => c.Id == id);
-                characters.Remove(character);
-                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+                Character dbCharacter = await _context.Characters.FirstAsync(c => c.Id == id);
+                _context.Characters.Remove(dbCharacter);
+                await _context.SaveChangesAsync();
+
+                serviceResponse.Data = _context.Characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             } catch(Exception ex) {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
@@ -72,16 +69,18 @@ namespace rpg_api.Services.CharacterService
             ServiceResponse<GetCharacterDto> serviceResponse = new ServiceResponse<GetCharacterDto>();
 
             try {
-                Character character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                var dbCharacter = await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
 
-                character.Name = updatedCharacter.Name;
-                character.HitPoints = updatedCharacter.HitPoints;
-                character.Strength = updatedCharacter.Strength;
-                character.Defense = updatedCharacter.Defense;
-                character.Intelligence = updatedCharacter.Intelligence;
-                character.Class = updatedCharacter.Class;
+                dbCharacter.Name = updatedCharacter.Name;
+                dbCharacter.HitPoints = updatedCharacter.HitPoints;
+                dbCharacter.Strength = updatedCharacter.Strength;
+                dbCharacter.Defense = updatedCharacter.Defense;
+                dbCharacter.Intelligence = updatedCharacter.Intelligence;
+                dbCharacter.Class = updatedCharacter.Class;
 
-                serviceResponse.Data = _mapper.Map<GetCharacterDto>(character);
+                await _context.SaveChangesAsync();
+
+                serviceResponse.Data = _mapper.Map<GetCharacterDto>(dbCharacter);
             } catch(Exception ex) {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
