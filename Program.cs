@@ -10,12 +10,9 @@ using Swashbuckle.AspNetCore.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-DotNetEnv.Env.Load();
-var connectionString = DotNetEnv.Env.GetString("CONNECTION_STRING");
-
 builder.Services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(connectionString));
-        
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
