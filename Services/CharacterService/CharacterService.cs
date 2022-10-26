@@ -42,11 +42,22 @@ namespace rpg_api.Services.CharacterService
             ServiceResponse<List<GetCharacterDto>> serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
 
             try {
-                Character dbCharacter = await _context.Characters.FirstAsync(c => c.Id == id);
-                _context.Characters.Remove(dbCharacter);
-                await _context.SaveChangesAsync();
+                Character dbCharacter = await _context.Characters
+                    .FirstOrDefaultAsync(c => c.Id == id && c.User.Id == GetUserId());
+                if(dbCharacter != null)
+                {
+                    _context.Characters.Remove(dbCharacter);
+                    await _context.SaveChangesAsync();
+                    serviceResponse.Data = _context.Characters
+                        .Where(c => c.User.Id == GetUserId())
+                        .Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Character not found";
+                }
 
-                serviceResponse.Data = _context.Characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             } catch(Exception ex) {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
