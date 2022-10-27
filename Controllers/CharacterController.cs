@@ -47,7 +47,11 @@ namespace rpg_api.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
         {
-            return Ok(await _characterService.AddCharacter(newCharacter));
+            var response = await _characterService.AddCharacter(newCharacter);
+            if(response.Data == null){
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
         [HttpPut]

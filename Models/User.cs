@@ -9,7 +9,7 @@ namespace rpg_api.Models
     {
         public int Id { get; set; }   
         public string UserName { get; set; } = string.Empty;
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public byte[] PasswordHash { get; set; } = new Byte[64];
+        public byte[] PasswordSalt { get; set; } = new Byte [64];
     }
 }
