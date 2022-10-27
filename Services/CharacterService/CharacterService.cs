@@ -7,6 +7,7 @@ using rpg_api.Data;
 using rpg_api.Dtos.Character;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using rpg_api.Services.GlobalService;
 
 namespace rpg_api.Services.CharacterService
 {
@@ -16,27 +17,26 @@ namespace rpg_api.Services.CharacterService
         private readonly IMapper _mapper;
         private readonly DataContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public CharacterService(IMapper mapper, DataContext context, IHttpContextAccessor httpContextAccessor)
+        private readonly IGlobalService _globalService;
+        public CharacterService
+        (
+            IMapper mapper, 
+            DataContext context, 
+            IHttpContextAccessor httpContextAccessor, 
+            IGlobalService globalService
+        )
         {
             _mapper = mapper;
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-        }
-
-
-        private int? GetUserId() {
-            var value = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(value == null){
-                return null;
-            }
-            return int.Parse(value);
+            _globalService = globalService;
         }
 
         public async Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto newCharacter)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             Character character = _mapper.Map<Character>(newCharacter);
-            var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+            var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _globalService.GetUserId());
             if(dbUser == null)
             {
                 serviceResponse.Success = false;
@@ -48,7 +48,7 @@ namespace rpg_api.Services.CharacterService
                 _context.Characters.Add(character);
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = await _context.Characters
-                    .Where(c => c.User.Id == GetUserId())
+                    .Where(c => c.User.Id == _globalService.GetUserId())
                     .Select(c => _mapper.Map<GetCharacterDto>(c)).ToListAsync();
             }
             return serviceResponse;
@@ -60,13 +60,13 @@ namespace rpg_api.Services.CharacterService
 
             try {
                 var dbCharacter = await _context.Characters
-                    .FirstOrDefaultAsync(c => c.Id == id && c.User.Id == GetUserId());
+                    .FirstOrDefaultAsync(c => c.Id == id && c.User.Id == _globalService.GetUserId());
                 if(dbCharacter != null)
                 {
                     _context.Characters.Remove(dbCharacter);
                     await _context.SaveChangesAsync();
                     serviceResponse.Data = _context.Characters
-                        .Where(c => c.User.Id == GetUserId())
+                        .Where(c => c.User.Id == _globalService.GetUserId())
                         .Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
                 }
                 else
@@ -87,7 +87,7 @@ namespace rpg_api.Services.CharacterService
         {
             var response = new ServiceResponse<List<GetCharacterDto>>();
             var dbCharacters = await _context.Characters
-                .Where(c => c.User.Id == GetUserId())
+                .Where(c => c.User.Id == _globalService.GetUserId())
                 .ToListAsync();
             response.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             return response;
@@ -97,7 +97,7 @@ namespace rpg_api.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
             var dbCharacter = await _context.Characters
-                .FirstOrDefaultAsync(c => c.Id == id && c.User.Id == GetUserId());
+                .FirstOrDefaultAsync(c => c.Id == id && c.User.Id == _globalService.GetUserId());
             serviceResponse.Data = _mapper.Map<GetCharacterDto>(dbCharacter);
             return serviceResponse;
         }
@@ -108,7 +108,7 @@ namespace rpg_api.Services.CharacterService
 
             try {
                 var dbCharacter = await _context.Characters
-                    .FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id && c.User.Id == GetUserId());
+                    .FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id && c.User.Id == _globalService.GetUserId());
                 if(dbCharacter == null)
                 {
                     serviceResponse.Success = false;
