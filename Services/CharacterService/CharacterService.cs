@@ -90,8 +90,8 @@ namespace rpg_api.Services.CharacterService
             ServiceResponse<GetCharacterDto> serviceResponse = new ServiceResponse<GetCharacterDto>();
 
             try {
-                var dbCharacter = await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
-
+                var dbCharacter = await _context.Characters
+                    .FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id && c.User.Id == GetUserId());
                 dbCharacter.Name = updatedCharacter.Name;
                 dbCharacter.HitPoints = updatedCharacter.HitPoints;
                 dbCharacter.Strength = updatedCharacter.Strength;
