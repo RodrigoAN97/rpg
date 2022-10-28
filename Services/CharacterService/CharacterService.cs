@@ -142,6 +142,8 @@ namespace rpg_api.Services.CharacterService
 
             try {
                 var dbCharacter = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
                     .FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id && c.User.Id == _globalService.GetUserId());
                 if(dbCharacter == null)
                 {
