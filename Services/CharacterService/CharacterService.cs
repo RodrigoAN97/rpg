@@ -73,7 +73,7 @@ namespace rpg_api.Services.CharacterService
                         response.Success = false;
                         response.Message = "Skill not found";
                     } else {
-                        character.Skills.Add(skill);
+                        character.Skills?.Add(skill);
                         await _context.SaveChangesAsync();
                         response.Data = _mapper.Map<GetCharacterDto>(character);
                     }
@@ -119,6 +119,8 @@ namespace rpg_api.Services.CharacterService
         {
             var response = new ServiceResponse<List<GetCharacterDto>>();
             var dbCharacters = await _context.Characters
+                .Include(c => c.Weapon)
+                .Include(c => c.Skills)
                 .Where(c => c.User.Id == _globalService.GetUserId())
                 .ToListAsync();
             response.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
