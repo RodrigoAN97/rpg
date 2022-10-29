@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using rpg_api.Data;
 using rpg_api.Services.CharacterService;
+using rpg_api.Services.FightService;
 using rpg_api.Services.GlobalService;
 using rpg_api.Services.WeaponService;
 using Swashbuckle.AspNetCore.Filters;
@@ -33,6 +34,7 @@ builder.Services.AddScoped<ICharacterService, CharacterService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IGlobalService, GlobalService>();
 builder.Services.AddScoped<IWeaponService, WeaponService>();
+builder.Services.AddScoped<IFightService, FightService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
         options.TokenValidationParameters = new TokenValidationParameters
