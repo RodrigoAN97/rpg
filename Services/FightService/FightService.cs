@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using rpg_api.Data;
 using rpg_api.Dtos.Fight;
 using rpg_api.Services.CharacterService;
+using rpg_api.Services.GlobalService;
 
 namespace rpg_api.Services.FightService
 {
@@ -12,10 +13,17 @@ namespace rpg_api.Services.FightService
     {
         private readonly DataContext _context;
         private readonly ICharacterService _characterService;
-        public FightService(DataContext context, ICharacterService characterService)
+        private readonly IGlobalService _globalService;
+        public FightService
+        (
+            DataContext context,
+            ICharacterService characterService,
+            IGlobalService globalService
+        )
         {
             _context = context;
             _characterService = characterService;
+            _globalService = globalService;
         }
 
         public async Task<ServiceResponse<AttackResultDto>> WeaponAttack(WeaponAttackDto request)
@@ -24,8 +32,7 @@ namespace rpg_api.Services.FightService
             try {
                 var attacker = await _characterService.GetCharacterById(request.AttackerId);
 
-                // TODO: write another method that does not check the owner of the character
-                var opponent = await _characterService.GetCharacterById(request.OpponentId);
+                var opponent = await _globalService.GetOpponentCharacterById(request.OpponentId);
 
                 if(attacker.Data == null || opponent.Data == null){
                     response.Success = false;
