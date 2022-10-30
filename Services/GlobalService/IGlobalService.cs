@@ -9,7 +9,5 @@ namespace rpg_api.Services.GlobalService
     public interface IGlobalService
     {
         int? GetUserId();
-
-        Task<ServiceResponse<GetCharacterDto>> GetOpponentCharacterById(int id);
     }
 }

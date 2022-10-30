@@ -28,16 +28,6 @@ namespace rpg_api.Services.GlobalService
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<GetCharacterDto>> GetOpponentCharacterById(int id)
-        {
-            var serviceResponse = new ServiceResponse<GetCharacterDto>();
-            var dbCharacter = await _context.Characters
-                .Include(c => c.Weapon)
-                .Include(c => c.Skills)
-                .FirstOrDefaultAsync(c => c.Id == id);
-            serviceResponse.Data = _mapper.Map<GetCharacterDto>(dbCharacter);
-            return serviceResponse;        }
-
         public int? GetUserId() {
             var value = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if(value == null){
