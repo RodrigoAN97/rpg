@@ -27,6 +27,58 @@ namespace rpg_api.Services.FightService
             _globalService = globalService;
         }
 
+        public async Task<ServiceResponse<AttackResultDto>> SkillAttack(SkillAttackDto request)
+        {
+            var response = new ServiceResponse<AttackResultDto>();
+            try {
+                var attacker = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .FirstOrDefaultAsync(c => c.Id == request.AttackerId && c.User.Id == _globalService.GetUserId());
+
+                var opponent = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .FirstOrDefaultAsync(c => c.Id == request.OpponentId);
+
+                if(attacker == null || opponent == null){
+                    response.Success = false;
+                    response.Message = "Character not found";
+                    return response;
+                }
+
+                var skill = attacker.Skills?.FirstOrDefault(s => s.Id == request.SkillId);
+                if(skill == null){
+                    response.Success = false;
+                    response.Message = $"{attacker.Name} doesn't know this skill";
+                    return response;
+                }
+
+                int damage = skill.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
+                damage -= new Random().Next(opponent.Defense);
+                if(damage > 0){
+                    opponent.HitPoints -= damage;
+                }
+                if(opponent.HitPoints < 0){
+                    response.Message = $"{opponent.Name} has been defeated!";
+                }
+                await _context.SaveChangesAsync();
+
+                response.Data = new AttackResultDto {
+                    AttackerName = attacker.Name,
+                    OpponentName = opponent.Name,
+                    AttackerHP = attacker.HitPoints,
+                    OpponentHP = opponent.HitPoints,
+                    Damage = damage
+                };
+                return response;
+            } catch(Exception ex){
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }        
+        }
+
         public async Task<ServiceResponse<AttackResultDto>> WeaponAttack(WeaponAttackDto request)
         {
             var response = new ServiceResponse<AttackResultDto>();
@@ -52,8 +104,6 @@ namespace rpg_api.Services.FightService
                     return response;
                 }
 
-                // TODO: write another method to calculate the damage, use intelligence or delete this prop
-                //TODO: save fights, defeats and victories to the characters context
                 int damage = attacker.Weapon.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
                 damage -= new Random().Next(opponent.Defense);
                 if(damage > 0){
