@@ -95,13 +95,15 @@ namespace rpg_api.Services.FightService
                     return response;
                 }
 
-                int damage = skill.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
-                damage -= new Random().Next(opponent.Defense);
-                if(damage > 0){
-                    opponent.HitPoints -= damage;
-                }
-                if(opponent.HitPoints < 0){
+                int damage = DoSkillAttack(attacker, opponent, skill);
+                
+                if(opponent.HitPoints <= 0){
                     response.Message = $"{opponent.Name} has been defeated!";
+            
+                    opponent.Fights++;
+                    attacker.Fights++;
+                    opponent.Defeats++;
+                    attacker.Victories++;
                 }
                 await _context.SaveChangesAsync();
 
@@ -147,7 +149,7 @@ namespace rpg_api.Services.FightService
 
                 int damage = DoWeaponAttack(attacker, opponent);
 
-                if(opponent.HitPoints < 0){
+                if(opponent.HitPoints <= 0){
                     response.Message = $"{opponent.Name} has been defeated!";
 
                     opponent.Fights++;
@@ -155,6 +157,7 @@ namespace rpg_api.Services.FightService
                     opponent.Defeats++;
                     attacker.Victories++;
                 }
+                
                 await _context.SaveChangesAsync();
 
                 response.Data = new AttackResultDto {
@@ -183,6 +186,15 @@ namespace rpg_api.Services.FightService
                 opponent.HitPoints -= damage;
             }
 
+            return damage;
+        }
+
+        public int DoSkillAttack(Character attacker, Character opponent, Skill skill){
+            int damage = skill.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
+            damage -= new Random().Next(opponent.Defense);
+            if(damage > 0){
+                opponent.HitPoints -= damage;
+            }
             return damage;
         }
     }
