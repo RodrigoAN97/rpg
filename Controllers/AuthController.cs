@@ -9,7 +9,7 @@ using rpg_api.Dtos.User;
 namespace rpg_api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController: ControllerBase
     {
         private readonly IAuthRepository _authRepo;
