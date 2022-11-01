@@ -38,6 +38,8 @@ namespace rpg_api.Services.WeaponService
             try
             {
                 Character? character = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
                     .FirstOrDefaultAsync(c => c.Id == newWeapon.CharacterId && c.User.Id == _globalService.GetUserId());
                 if(character == null){
                     response.Success = false;
