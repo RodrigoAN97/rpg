@@ -20,7 +20,7 @@ namespace rpg_api.Controllers
             _fightService = fightService;
         }
 
-        [HttpPost]
+        [HttpPost("AutoFight")]
         public async Task<ActionResult<ServiceResponse<FightRequestDto>>> Fight(FightRequestDto request)
         {
             return Ok(await _fightService.AutoFight(request));
