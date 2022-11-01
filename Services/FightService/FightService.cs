@@ -49,9 +49,9 @@ namespace rpg_api.Services.FightService
                     }
                 }
 
-                bool defeated = false;
-                while(!defeated) {
-                    foreach(Character attacker in characters)
+                bool onlyOneLeft = false;
+                while(!onlyOneLeft) {
+                    foreach(Character attacker in characters.ToList())
                     {
                         var opponents = characters.Where(c => c.Id != attacker.Id).ToList();
                         var opponent = opponents[new Random().Next(opponents.Count)];
@@ -75,12 +75,16 @@ namespace rpg_api.Services.FightService
                         response.Data.Log.Add($"{attacker.Name} attacks {opponent.Name} using {attackUsed} with {(damage > 0 ? damage : 0)} damage.");
                         if(opponent.HitPoints <= 0)
                         {   
-                            defeated = true;
-                            attacker.Victories++;
+                            characters.Remove(opponent);
                             opponent.Defeats++;
                             response.Data.Log.Add($"{opponent.Name} has been defeated!");
-                            response.Data.Log.Add($"{attacker.Name} wins with {attacker.HitPoints} HP left!");
-                            break;
+
+                            if(characters.Count == 1){
+                                onlyOneLeft = true;
+                                attacker.Victories++;
+                                response.Data.Log.Add($"{attacker.Name} wins with {attacker.HitPoints} HP left!");
+                                break;
+                            }
                         }
                     }
                 }
