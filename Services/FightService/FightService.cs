@@ -27,6 +27,47 @@ namespace rpg_api.Services.FightService
             _globalService = globalService;
         }
 
+        public async Task<ServiceResponse<FightResultDto>> AutoFight(FightRequestDto request)
+        {
+            var response = new ServiceResponse<FightResultDto>{
+                Data = new FightResultDto()
+            };
+
+            try {
+                var characters = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .Where(c => request.CharacterIds.Contains(c.Id)).ToListAsync();
+
+                bool defeated = false;
+                while(!defeated) {
+                    foreach(Character attacker in characters)
+                    {
+                        var opponents = characters.Where(c => c.Id != attacker.Id).ToList();
+                        var opponent = opponents[new Random().Next(opponents.Count)];
+
+                        int damage = 0;
+                        string attackUsed = string.Empty;
+
+                        bool useWeapon = new Random().Next(2) == 0;
+                        if(useWeapon)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+
+            } catch (Exception ex) {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
         public async Task<ServiceResponse<AttackResultDto>> SkillAttack(SkillAttackDto request)
         {
             var response = new ServiceResponse<AttackResultDto>();
