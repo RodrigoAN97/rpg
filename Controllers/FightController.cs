@@ -11,7 +11,7 @@ namespace rpg_api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("controller")]
+    [Route("api/[controller]")]
     public class FightController: ControllerBase
     {
         private readonly IFightService _fightService;
