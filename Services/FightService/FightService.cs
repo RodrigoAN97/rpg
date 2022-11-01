@@ -104,13 +104,15 @@ namespace rpg_api.Services.FightService
                     return response;
                 }
 
-                int damage = attacker.Weapon.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
-                damage -= new Random().Next(opponent.Defense);
-                if(damage > 0){
-                    opponent.HitPoints -= damage;
-                }
+                int damage = DoWeaponAttack(attacker, opponent);
+
                 if(opponent.HitPoints < 0){
                     response.Message = $"{opponent.Name} has been defeated!";
+
+                    opponent.Fights++;
+                    attacker.Fights++;
+                    opponent.Defeats++;
+                    attacker.Victories++;
                 }
                 await _context.SaveChangesAsync();
 
@@ -127,6 +129,20 @@ namespace rpg_api.Services.FightService
                 response.Message = ex.Message;
                 return response;
             }
+        }
+
+        public int DoWeaponAttack(Character attacker, Character opponent){
+            if(attacker.Weapon == null) {
+                return 0;
+            }
+
+            int damage = attacker.Weapon.Damage + new Random().Next(attacker.Strength) + new Random().Next(attacker.Intelligence);
+            damage -= new Random().Next(opponent.Defense);
+            if(damage > 0){
+                opponent.HitPoints -= damage;
+            }
+
+            return damage;
         }
     }
 }
