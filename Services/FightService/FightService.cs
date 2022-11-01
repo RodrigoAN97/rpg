@@ -38,6 +38,16 @@ namespace rpg_api.Services.FightService
                     .Include(c => c.Weapon)
                     .Include(c => c.Skills)
                     .Where(c => request.CharacterIds.Contains(c.Id)).ToListAsync();
+                
+                foreach(Character character in characters)
+                {
+                    if(character.Skills == null || character.Weapon == null)
+                    {
+                        response.Success = false;
+                        response.Message = "You should only enter in a auto fight with characters that have a weapon and at least one skill!";
+                        return response;
+                    }
+                }
 
                 bool defeated = false;
                 while(!defeated) {
@@ -50,16 +60,37 @@ namespace rpg_api.Services.FightService
                         string attackUsed = string.Empty;
 
                         bool useWeapon = new Random().Next(2) == 0;
-                        if(useWeapon)
+                        if(useWeapon && attacker.Weapon != null)
                         {
-
+                            attackUsed = attacker.Weapon.Name;
+                            damage = DoWeaponAttack(attacker, opponent);
                         }
-                        else
+                        else if(attacker.Skills != null)
                         {
+                            var skill = attacker.Skills[new Random().Next(attacker.Skills.Count)];
+                            attackUsed = skill.Name;
+                            damage = DoSkillAttack(attacker, opponent, skill);
+                        }
 
+                        response.Data.Log.Add($"{attacker.Name} attacks {opponent.Name} using {attackUsed} with {(damage > 0 ? damage : 0)} damage.");
+                        if(opponent.HitPoints <= 0)
+                        {   
+                            defeated = true;
+                            attacker.Victories++;
+                            opponent.Defeats++;
+                            response.Data.Log.Add($"{opponent.Name} has been defeated!");
+                            response.Data.Log.Add($"{attacker.Name} wins with {attacker.HitPoints} HP left!");
+                            break;
                         }
                     }
                 }
+
+                characters.ForEach(c => {
+                    c.Fights++;
+                    c.HitPoints = 100;
+                });
+
+                await _context.SaveChangesAsync();
 
             } catch (Exception ex) {
                 response.Success = false;
