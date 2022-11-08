@@ -41,6 +41,7 @@ namespace rpg_api.Services.FightService
                 
                 foreach(Character character in characters)
                 {
+                    //TODO: allow only characters owned by user
                     if(character.Skills == null || character.Weapon == null)
                     {
                         response.Success = false;
@@ -89,7 +90,8 @@ namespace rpg_api.Services.FightService
                     }
                 }
 
-                characters.ForEach(c => {
+                //TODO: not saving
+                characters.ToList().ForEach(c => {
                     c.Fights++;
                     c.HitPoints = 100;
                 });
