@@ -37,11 +37,10 @@ namespace rpg_api.Services.FightService
                 var characters = await _context.Characters
                     .Include(c => c.Weapon)
                     .Include(c => c.Skills)
-                    .Where(c => request.CharacterIds.Contains(c.Id)).ToListAsync();
+                    .Where(c => request.CharacterIds.Contains(c.Id) && c.User.Id == _globalService.GetUserId()).ToListAsync();
                 
                 foreach(Character character in characters)
                 {
-                    //TODO: allow only characters owned by user
                     if(character.Skills == null || character.Weapon == null)
                     {
                         response.Success = false;
