@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using rpg_api.Data;
 using rpg_api.Dtos.User;
+using rpg_api.Services.AuthService;
 
 namespace rpg_api.Controllers
 {
@@ -12,8 +12,8 @@ namespace rpg_api.Controllers
     [Route("api/[controller]")]
     public class AuthController: ControllerBase
     {
-        private readonly IAuthRepository _authRepo;
-        public AuthController(IAuthRepository authRepo)
+        private readonly IAuthService _authRepo;
+        public AuthController(IAuthService authRepo)
         {
             _authRepo = authRepo;
         }

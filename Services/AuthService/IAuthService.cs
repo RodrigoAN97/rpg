@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace rpg_api.Data
+namespace rpg_api.Services.AuthService
 {
-    public interface IAuthRepository
+    public interface IAuthService
     {
         Task<ServiceResponse<int>> Register(User user, string password);
         Task<ServiceResponse<string>> Login(string username, string password);

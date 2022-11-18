@@ -6,14 +6,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using rpg_api.Data;
 
-namespace rpg_api.Data
+namespace rpg_api.Services.AuthService
 {
-    public class AuthRepository : IAuthRepository
+    public class AuthService : IAuthService
     {
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
-        public AuthRepository(DataContext context, IConfiguration configuration)
+        public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
